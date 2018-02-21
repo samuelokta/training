@@ -1,14 +1,10 @@
 public with sharing class MaintenanceRequestHelper 
 {
     private static final Set<String> MAINTENANCE_TYPE = new Set<String>{'Repair','Routine Maintenance'};
-    private static final String CASE_STATUS_CLOSED = 'Closed';
-    private static final String CASE_STAUS_NEW = 'New';
-    private static final String CASE_TYPE_ROUTINE_MAINTENANCE = 'Routine Maintenance';
-
-    public MaintenanceRequestHelper() 
-    {
-
-    }
+    public static final String CASE_STATUS_CLOSED = 'Closed';
+    public static final String CASE_STAUS_NEW = 'New';
+    public static final String CASE_TYPE_REPAIR = 'Repair';
+    public static final String CASE_TYPE_ROUTINE_MAINTENANCE = 'Routine Maintenance';
 
     public static void automateMaintenanceRequests()
     {
@@ -30,6 +26,7 @@ public with sharing class MaintenanceRequestHelper
                     Case clone = newCase.clone();
                     clone.Status = CASE_STAUS_NEW;
                     clone.Type = CASE_TYPE_ROUTINE_MAINTENANCE;
+                    clone.Date_Reported__c = Date.today();
                     casesToAutomateCreation.put(newCase.Id, clone);
                     initialDueDateByCaseId.put(newCase.Id, (clone.Date_Due__c!=null)?clone.Date_Due__c:Date.today());
                 }
@@ -50,8 +47,7 @@ public with sharing class MaintenanceRequestHelper
                 {   
                     String caseId = workPart.Maintenance_Request__c;
 
-                    if( minDueDateByCaseId.get(caseId) == null || 
-                        minDueDateByCaseId.get(caseId) > workPart.Equipment__r.Maintenance_Cycle__c)
+                    if( minDueDateByCaseId.get(caseId) == null || minDueDateByCaseId.get(caseId) > workPart.Equipment__r.Maintenance_Cycle__c)
                     {	
                         
                         minDueDateByCaseId.put(caseId, workPart.Equipment__r.Maintenance_Cycle__c);
